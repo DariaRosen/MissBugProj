@@ -8,13 +8,14 @@
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "start": "node bugs_server.js",
-    "server:dev": "node server.js"
+    "start": "node server.js",
+    "server:dev": "nodemon --ignore \"./data\" server.js"
   },
   "dependencies": {
     "axios": "^1.5.0",
     "cookie-parser": "^1.4.7",
     "express": "^5.1.0",
+    "nodemon": "^3.1.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.1.2",

@@ -1,5 +1,7 @@
 import express from 'express'
 import fs from 'fs'
+import { utilService } from './src/services/util.service.js'
+import { bugService } from './src/services/bug.service.js'
 
 const app = express()
 
@@ -8,29 +10,32 @@ app.get('/', (req, res) => {
 })
 
 app.get('/api/bug', async (req, res) => {
-    const bugs = JSON.parse(fs.readFileSync('data/bugs.json'))
+    const bugs = await bugService.query()
     res.send(bugs)
 })
 
 app.get('/api/bug/save', async (req, res) => {
-    const newBug = req.body
-    const bugs = JSON.parse(fs.readFileSync('data/bugs.json'))
-    bugs.push(newBug)
-    fs.writeFileSync('data/bugs.json', JSON.stringify(bugs))
-    res.send(newBug)
+    const { _id, title, severity, createdAt } = req.query
+    const bugToSave = {
+        _id,
+        title,
+        severity: +severity,
+        createdAt
+    }
+    const savedBug = await bugService.save(bugToSave)
+    res.send(savedBug)
 })
 
 app.get('/api/bug/:bugId', async (req, res) => {
-    const bugs = JSON.parse(fs.readFileSync('data/bugs.json'))
-    const bug = bugs.find(b => b._id === req.params.bugId)
+    const bugId = req.params.bugId
+    const bug = await bugService.getById(bugId)
     res.send(bug)
 })
 
 app.get('/api/bug/:bugId/remove', async (req, res) => {
-    const bugs = JSON.parse(fs.readFileSync('data/bugs.json'))
-    const filteredBugs = bugs.filter(b => b._id !== req.params.bugId)
-    fs.writeFileSync('data/bugs.json', JSON.stringify(filteredBugs))
-    res.send({ removed: req.params.bugId })
+    const bugId = req.params.bugId
+    await bugService.remove(bugId)
+    res.send({ msg: 'Removed successfully' })
 })
 
 const port = 3030
